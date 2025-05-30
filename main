@@ -1,0 +1,217 @@
+#include "fila_prioridade.h"
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+
+#define N_PROD 1
+#define N_CONS 1
+#define N_REPR 1
+
+extern int heapify_up_count;
+extern int heapify_down_count;
+
+void* produtor(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        Pedido p;
+        p.id_dispositivo = rand() % 50;
+        p.timestamp = time(NULL);
+        p.prioridade = rand() % 100;
+        inserir(p);
+        usleep(100000);  // 100 ms
+    }
+    return NULL;
+}
+
+void* consumidor(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        Pedido p = remover();
+        printf("[CONSUMO] ID %d, prioridade %d, timestamp %ld\n",
+               p.id_dispositivo, p.prioridade, p.timestamp);
+        usleep(150000);  // 150 ms
+    }
+    return NULL;
+}
+
+void* atualizador(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        int id = rand() % 50;
+        int nova_prioridade = rand() % 100;
+        int res = repriorizar(id, nova_prioridade);
+        if (res)
+            printf("[REPRIORIZAR] ID %d => nova prioridade %d\n", id, nova_prioridade);
+        usleep(200000);  // 200 ms#include "fila_prioridade.h"
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+
+#define N_PROD 1
+#define N_CONS 1
+#define N_REPR 1
+
+extern int heapify_up_count;
+extern int heapify_down_count;
+
+void* produtor(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        Pedido p;
+        p.id_dispositivo = rand() % 50;
+        p.timestamp = time(NULL);
+        p.prioridade = rand() % 100;
+        inserir(p);
+        usleep(100000);  // 100 ms
+    }
+    return NULL;
+}
+
+void* consumidor(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        Pedido p = remover();
+        printf("[CONSUMO] ID %d, prioridade %d, timestamp %ld\n",
+               p.id_dispositivo, p.prioridade, p.timestamp);
+        usleep(150000);  // 150 ms
+    }
+    return NULL;
+}
+
+void* atualizador(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        int id = rand() % 50;
+        int nova_prioridade = rand() % 100;
+        int res = repriorizar(id, nova_prioridade);
+        if (res)
+            printf("[REPRIORIZAR] ID %d => nova prioridade %d\n", id, nova_prioridade);
+        usleep(200000);  // 200 ms
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t prod[N_PROD], cons[N_CONS], repr[N_REPR];
+
+    srand(time(NULL));
+    inicializar_fila();
+
+    for (int i = 0; i < N_PROD; i++)
+        pthread_create(&prod[i], NULL, produtor, NULL);
+    for (int i = 0; i < N_CONS; i++)
+        pthread_create(&cons[i], NULL, consumidor, NULL);
+    for (int i = 0; i < N_REPR; i++)
+        pthread_create(&repr[i], NULL, atualizador, NULL);
+
+    for (int i = 0; i < N_PROD; i++)
+        pthread_join(prod[i], NULL);
+    for (int i = 0; i < N_CONS; i++)#include "fila_prioridade.h"
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+
+#define N_PROD 1
+#define N_CONS 1
+#define N_REPR 1
+
+extern int heapify_up_count;
+extern int heapify_down_count;
+
+void* produtor(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        Pedido p;
+        p.id_dispositivo = rand() % 50;
+        p.timestamp = time(NULL);
+        p.prioridade = rand() % 100;
+        inserir(p);
+        usleep(100000);  // 100 ms
+    }
+    return NULL;
+}
+
+void* consumidor(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        Pedido p = remover();
+        printf("[CONSUMO] ID %d, prioridade %d, timestamp %ld\n",
+               p.id_dispositivo, p.prioridade, p.timestamp);
+        usleep(150000);  // 150 ms
+    }
+    return NULL;
+}
+
+void* atualizador(void* arg) {
+    for (int i = 0; i < 100; i++) {
+        int id = rand() % 50;
+        int nova_prioridade = rand() % 100;
+        int res = repriorizar(id, nova_prioridade);
+        if (res)
+            printf("[REPRIORIZAR] ID %d => nova prioridade %d\n", id, nova_prioridade);
+        usleep(200000);  // 200 ms
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t prod[N_PROD], cons[N_CONS], repr[N_REPR];
+
+    srand(time(NULL));
+    inicializar_fila();
+
+    for (int i = 0; i < N_PROD; i++)
+        pthread_create(&prod[i], NULL, produtor, NULL);
+    for (int i = 0; i < N_CONS; i++)
+        pthread_create(&cons[i], NULL, consumidor, NULL);
+    for (int i = 0; i < N_REPR; i++)
+        pthread_create(&repr[i], NULL, atualizador, NULL);
+
+    for (int i = 0; i < N_PROD; i++)
+        pthread_join(prod[i], NULL);
+    for (int i = 0; i < N_CONS; i++)
+        pthread_join(cons[i], NULL);
+    for (int i = 0; i < N_REPR; i++)
+        pthread_join(repr[i], NULL);
+
+    printf("Total heapify_up_count: %d\n", heapify_up_count);
+    printf("Total heapify_down_count: %d\n", heapify_down_count);
+
+    return 0;
+}
+        pthread_join(cons[i], NULL);
+    for (int i = 0; i < N_REPR; i++)
+        pthread_join(repr[i], NULL);
+
+    printf("Total heapify_up_count: %d\n", heapify_up_count);
+    printf("Total heapify_down_count: %d\n", heapify_down_count);
+
+    return 0;
+}
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t prod[N_PROD], cons[N_CONS], repr[N_REPR];
+
+    srand(time(NULL));
+    inicializar_fila();
+
+    for (int i = 0; i < N_PROD; i++)
+        pthread_create(&prod[i], NULL, produtor, NULL);
+    for (int i = 0; i < N_CONS; i++)
+        pthread_create(&cons[i], NULL, consumidor, NULL);
+    for (int i = 0; i < N_REPR; i++)
+        pthread_create(&repr[i], NULL, atualizador, NULL);
+
+    for (int i = 0; i < N_PROD; i++)
+        pthread_join(prod[i], NULL);
+    for (int i = 0; i < N_CONS; i++)
+        pthread_join(cons[i], NULL);
+    for (int i = 0; i < N_REPR; i++)
+        pthread_join(repr[i], NULL);
+
+    printf("Total heapify_up_count: %d\n", heapify_up_count);
+    printf("Total heapify_down_count: %d\n", heapify_down_count);
+
+    return 0;
+}
